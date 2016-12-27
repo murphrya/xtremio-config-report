@@ -1,7 +1,10 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    colored (1.2)
     colorize (0.8.1)
+    command_line_reporter (3.3.6)
+      colored (>= 1.2)
     json (2.0.2)
 
 PLATFORMS
@@ -9,6 +12,7 @@ PLATFORMS
 
 DEPENDENCIES
   colorize
+  command_line_reporter
   json
 
 BUNDLED WITH
