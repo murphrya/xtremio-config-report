@@ -79,6 +79,11 @@ def printTable(table)
   puts ""
 end
 
+def printFooter
+  puts " "
+  puts "+---------------------------------- End Report --------------------------------+".colorize(:light_yellow)
+  puts " "
+end
 
 #testing commands
 #puts json["AllVolumes"][0]["logical_space_in_use"]
@@ -175,3 +180,4 @@ printTable(configurationTable)
 printTable(physCapacityTable)
 printTable(logicalCapacityTable)
 printTable(efficiencyTable)
+printFooter
