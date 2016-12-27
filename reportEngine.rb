@@ -61,9 +61,9 @@ end
 #Prints the program header to the command line
 def printHeader
   puts " "
-  puts "+---------------------- XtremIO Configuration Report v0.0 ---------------------+".colorize(:light_yellow)
-  puts " "
-  puts "This report is used to spot check an XtremIO cluster by using the dossier file.\nIt will report on cluster configuration, capacity, and efficiency.".colorize(:yellow)
+  puts "########################################### Start Report ###########################################".colorize(:light_black)
+  puts "XtremIO Dossier Reporter v0.0: This report is used to spot check an XtremIO cluster by using the".colorize(:green)
+  puts "dossier file. It will report on cluster configuration, capacity, and efficiency.".colorize(:green)
   puts ""
 end
 
@@ -81,7 +81,7 @@ end
 
 def printFooter
   puts " "
-  puts "+---------------------------------- End Report --------------------------------+".colorize(:light_yellow)
+  puts "############################################ End Report ############################################".colorize(:light_black)
   puts " "
 end
 
@@ -105,7 +105,7 @@ printHeader
 xmsTable = generateTable("XMS Server Configuration".colorize(:light_blue),
                          ['XMS IP'.colorize(:cyan), 'XMS Code'.colorize(:cyan),'Attached Clusters'.colorize(:cyan)],
                          [[xmsIp, xmsCode, clusterCount.to_s.colorize(:light_white)]],
-                         {:width => 80})
+                         {:width => 100})
 printTable(xmsTable)
 
 ##### Generate the clusters configuration table rows#####
@@ -144,7 +144,24 @@ clusterCount.times do
   clusterSvgTotal = clusterSvgCount.to_s.colorize(:light_white)
   clusterLogicalConsumed= clusterSvgConsumed.round(1).to_s.colorize(:light_white)
   clusterTotalLogical = clusterSvgTotalLogical.round(1).to_s.colorize(:light_white)
-  logicalCapacityRows << [clusterSerial,clusterSvgTotal,clusterLogicalConsumed,clusterTotalLogical]
+
+  #generate cluster volume information
+  sourceVolCount = 0
+  snapVolCount = 0
+  allVolumes.each do |vol|
+    if vol["sys_id"][1] == jsonHash["Systems"][counter]["name"]
+      if vol["created_from_volume"] == ""
+        sourceVolCount += 1
+      else
+        snapVolCount += 1
+      end
+    end
+  end
+  sourceVolTotal = sourceVolCount.to_s.colorize(:light_white)
+  snapVolTotal = snapVolCount.to_s.colorize(:light_white)
+
+  logicalCapacityRows << [clusterSerial,clusterSvgTotal,clusterLogicalConsumed,clusterTotalLogical,sourceVolTotal,snapVolTotal]
+
 
   #generate cluster efficiency information
   clusterDedupe = jsonHash["AllSystems"][counter]["dedup_ratio"].round(1).to_s.colorize(:light_white)
@@ -159,22 +176,22 @@ end
 configurationTable = generateTable("Current Configuration - All Clusters".colorize(:light_blue),
                          ['PSTN'.colorize(:cyan),'Name'.colorize(:cyan),'Code'.colorize(:cyan),'Type'.colorize(:cyan),'State'.colorize(:cyan),'Major Alerts'.colorize(:cyan)],
                          configurationRows,
-                         {:width => 80})
+                         {:width => 100})
 
 physCapacityTable = generateTable("Physical Capacity - All Clusters".colorize(:light_blue),
                               ['PSTN'.colorize(:cyan), 'SSD Usable (TB)'.colorize(:cyan),'SSD Consumed (TB)'.colorize(:cyan),'SSD Free (TB)'.colorize(:cyan)],
                               physCapacityRows,
-                              {:width => 80})
+                              {:width => 100})
 
 logicalCapacityTable = generateTable("Logical Capacity - All Clusters".colorize(:light_blue),
-                                  ['PSTN'.colorize(:cyan), 'SVG Count'.colorize(:cyan),'Logical Consumed (TB)'.colorize(:cyan),'Total Logical (TB)'.colorize(:cyan)],
+                                  ['PSTN'.colorize(:cyan), 'SVGs'.colorize(:cyan),'Logical Consumed (TB)'.colorize(:cyan),'Total Logical (TB)'.colorize(:cyan),'Source Vols'.colorize(:cyan),'Snap Vols'.colorize(:cyan)],
                                   logicalCapacityRows,
-                                  {:width => 80})
+                                  {:width => 100})
 
 efficiencyTable = generateTable("Efficiency - All Clusters".colorize(:light_blue),
                               ['PSTN'.colorize(:cyan), 'Dedupe'.colorize(:cyan),'Compression'.colorize(:cyan),'DRR'.colorize(:cyan),'Thin Ratio'.colorize(:cyan),'Total Efficiency'.colorize(:cyan)],
                               efficiencyRows,
-                              {:width => 80})
+                              {:width => 100})
 
 printTable(configurationTable)
 printTable(physCapacityTable)
