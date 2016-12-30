@@ -8,10 +8,6 @@ module DossierEngine
 
   #Opens dossier file and pulls out the json data
   def unpackDossieJson(location)
-    #myjsonfile = 'small/xms/xmcli/show_all.json'
-    #input = %x[unzip -p #{location} | bzip2 -q -dc - | tar -xvf - #{myjsonfile} -O]
-    #puts input
-
     %x[unzip #{location} -d tempdir]
     filenames = Dir["tempdir/*"]
     filenames.each do |filename|

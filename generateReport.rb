@@ -3,34 +3,9 @@ require 'json'
 require 'colorize'
 require 'terminal-table'
 load 'modules\dossierEngine.rb'
+load 'modules\reportEngine.rb'
 include DossierEngine
-
-#Prints the program header to the command line
-def printHeader
-  puts " "
-  puts "########################################### Start Report ###########################################".colorize(:light_black)
-  puts "XtremIO Dossier Reporter v0.0: This report is used to spot check an XtremIO cluster by using the".colorize(:green)
-  puts "dossier file. It will report on cluster configuration, capacity, and efficiency.".colorize(:green)
-  puts ""
-end
-
-#Creates a table with the user defined variables
-def generateTable(title,headings,rows,style)
-  table = Terminal::Table.new :title => title, :headings => headings, :rows => rows, :style => style
-  return table
-end
-
-#Prints the provided table to the command line
-def printTable(table)
-  puts table
-  puts ""
-end
-
-def printFooter
-  puts " "
-  puts "############################################ End Report ############################################".colorize(:light_black)
-  puts " "
-end
+include ReportEngine
 
 ##### Generate Variables Used by multiple clusters #####
 Process.setproctitle("XtremIO Configuration Report")
@@ -45,11 +20,11 @@ allSnapshotGroups = DossierEngine.getAllSnapshotGroups(jsonHash)
 ##### Generate the XMS table #####
 printHeader
 
-xmsTable = generateTable("XMS Server Configuration".colorize(:light_blue),
+xmsTable = ReportEngine.generateTable("XMS Server Configuration".colorize(:light_blue),
                          ['XMS IP'.colorize(:cyan), 'XMS Code'.colorize(:cyan),'Attached Clusters'.colorize(:cyan)],
                          [[xmsIp, xmsCode, clusterCount.to_s.colorize(:light_white)]],
                          {:width => 100})
-printTable(xmsTable)
+ReportEngine.printTable(xmsTable)
 
 ##### Generate the clusters configuration table rows#####
 counter = 0
@@ -116,28 +91,28 @@ clusterCount.times do
 
 end
 
-configurationTable = generateTable("Current Configuration - All Clusters".colorize(:light_blue),
+configurationTable = ReportEngine.generateTable("Current Configuration - All Clusters".colorize(:light_blue),
                          ['PSTN'.colorize(:cyan),'Name'.colorize(:cyan),'Code'.colorize(:cyan),'Type'.colorize(:cyan),'State'.colorize(:cyan),'Major Alerts'.colorize(:cyan)],
                          configurationRows,
                          {:width => 100})
 
-physCapacityTable = generateTable("Physical Capacity - All Clusters".colorize(:light_blue),
+physCapacityTable = ReportEngine.generateTable("Physical Capacity - All Clusters".colorize(:light_blue),
                               ['PSTN'.colorize(:cyan), 'SSD Usable (TB)'.colorize(:cyan),'SSD Consumed (TB)'.colorize(:cyan),'SSD Free (TB)'.colorize(:cyan)],
                               physCapacityRows,
                               {:width => 100})
 
-logicalCapacityTable = generateTable("Logical Capacity - All Clusters".colorize(:light_blue),
+logicalCapacityTable = ReportEngine.generateTable("Logical Capacity - All Clusters".colorize(:light_blue),
                                   ['PSTN'.colorize(:cyan), 'SVGs'.colorize(:cyan),'Logical Consumed (TB)'.colorize(:cyan),'Total Logical (TB)'.colorize(:cyan),'Source Vols'.colorize(:cyan),'Snap Vols'.colorize(:cyan)],
                                   logicalCapacityRows,
                                   {:width => 100})
 
-efficiencyTable = generateTable("Efficiency - All Clusters".colorize(:light_blue),
+efficiencyTable = ReportEngine.generateTable("Efficiency - All Clusters".colorize(:light_blue),
                               ['PSTN'.colorize(:cyan), 'Dedupe'.colorize(:cyan),'Compression'.colorize(:cyan),'DRR'.colorize(:cyan),'Thin Ratio'.colorize(:cyan),'Total Efficiency'.colorize(:cyan)],
                               efficiencyRows,
                               {:width => 100})
 
-printTable(configurationTable)
-printTable(physCapacityTable)
-printTable(logicalCapacityTable)
-printTable(efficiencyTable)
-printFooter
+ReportEngine.printTable(configurationTable)
+ReportEngine.printTable(physCapacityTable)
+ReportEngine.printTable(logicalCapacityTable)
+ReportEngine.printTable(efficiencyTable)
+ReportEngine.printFooter
