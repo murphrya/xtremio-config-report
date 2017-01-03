@@ -293,13 +293,13 @@ module DossierEngine
       end
 
       totalVols = (sourceVolCount + snapVolCount).to_s.colorize(:light_white)
-      totalConsumed = (sourceVolConsumed + snapVolConsumed).round(1).to_s.colorize(:light_white)
-      totalMappedConsumed = (sourceMappedConsumed + snapMappedConsumed).round(1).to_s.colorize(:light_white)
-      totalLogical = (sourceVolTotalLogi + snapVolTotalLogi).round(1).to_s.colorize(:light_white)
-      clusterPhysConsumed = ((jsonHash["Systems"][counter]["ud_ssd_space_in_use"].to_f)/1024.0/1024.0/1024.0).round(1)
-      clusterDrrNoSnap = (sourceMappedConsumed / clusterPhysConsumed).round(1).to_s.colorize(:light_white)
-      clusterDrrWithSnap = ((sourceVolConsumed + snapVolConsumed) / clusterPhysConsumed).round(1).to_s.colorize(:light_white)
-      clusterDrrOnlySnap = (snapVolConsumed / clusterPhysConsumed).round(1).to_s.colorize(:light_white)
+      totalConsumed = (sourceVolConsumed + snapVolConsumed).round(2).to_s.colorize(:light_white)
+      totalMappedConsumed = (sourceMappedConsumed + snapMappedConsumed).round(2).to_s.colorize(:light_white)
+      totalLogical = (sourceVolTotalLogi + snapVolTotalLogi).round(2).to_s.colorize(:light_white)
+      clusterPhysConsumed = ((jsonHash["Systems"][counter]["ud_ssd_space_in_use"].to_f)/1024.0/1024.0/1024.0).round(2)
+      clusterDrrNoSnap = (sourceMappedConsumed / clusterPhysConsumed).round(2).to_s.colorize(:light_white)
+      clusterDrrWithSnap = ((sourceVolConsumed + snapVolConsumed) / clusterPhysConsumed).round(2).to_s.colorize(:light_white)
+      clusterDrrOnlySnap = (snapVolConsumed / clusterPhysConsumed).round(2).to_s.colorize(:light_white)
       drrRows << [clusterSerial,totalVols,totalLogical,totalConsumed,clusterDrrNoSnap,clusterDrrWithSnap,clusterDrrOnlySnap]
     end
     return drrRows
