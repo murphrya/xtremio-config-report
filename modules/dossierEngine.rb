@@ -121,6 +121,8 @@ module DossierEngine
         end
       end
       allVolumes.each do |vol|
+        puts vol["created_by_app"]
+        puts "------------------------------------------------------------------------------------------------------"
         if vol["sys_id"][1] == jsonHash["Systems"][counter]["name"]
           if vol["created_from_volume"] == ""
             sourceVolCount += 1
@@ -201,7 +203,7 @@ module DossierEngine
         if vol["sys_id"][1] == jsonHash["Systems"][counter]["name"]
           if vol["created_from_volume"] == ""
           else
-            if vol["created_by_app"] == ""
+            if vol["created_by_app"] != "recoverpoint"
               snapVolCount += 1
               snapVolConsumed += (vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0
               snapVolTotalLogi += (vol["vol_size"].to_f)/1024.0/1024.0/1024.0
@@ -236,8 +238,7 @@ module DossierEngine
         if vol["sys_id"][1] == jsonHash["Systems"][counter]["name"]
           if vol["created_from_volume"] == ""
           else
-            if vol["created_by_app"] == ""
-            else
+            if vol["created_by_app"] == "recoverpoint"
               rpVolCount += 1
               rpVolConsumed += (vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0
               rpVolTotalLogi += (vol["vol_size"].to_f)/1024.0/1024.0/1024.0
