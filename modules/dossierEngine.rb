@@ -5,6 +5,15 @@ module DossierEngine
     return ARGV[0]
   end
 
+  #Get the location of the json file from the user
+  def getFlags
+    if ARGV[1] == "verbose"
+      return true
+    else
+      return false
+    end
+  end
+
   #Opens dossier file and pulls out the json data
   def unpackDossieJson(location)
     %x[unzip #{location} -d tempdir]
@@ -147,4 +156,51 @@ module DossierEngine
     return efficiencyRows
   end
 
+
+  def generateVerboseRows(jsonHash,clusterCount,allVolumes,allSnapshotGroups)
+    counter = 0
+    sourceVolCount = 0
+    sourceVolConsumed = 0.0
+    sourceVolTotalLogi = 0.0
+    snapVolCount = 0
+    snapVolConsumed = 0.0
+    snapVolTotalLogi = 0.0
+    rpVolCount = 0
+    rpVolConsumed = 0.0
+    rpVolTotalLogi = 0.0
+    verboseRows = []
+    clusterCount.times do
+      #Generate cluster configuration information
+      clusterSerial = jsonHash["SystemsInfo"][counter]["psnt"].colorize(:light_white)
+      #totals for each volume type
+      allVolumes.each do |vol|
+        if vol["sys_id"][1] == jsonHash["Systems"][counter]["name"]
+          if vol["created_from_volume"] == ""
+            sourceVolCount += 1
+            sourceVolConsumed += (vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0
+            sourceVolTotalLogi += (vol["vol_size"].to_f)/1024.0/1024.0/1024.0
+          else
+            if vol["created_by_app"] == ""
+              snapVolCount += 1
+              snapVolConsumed += (vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0
+              snapVolTotalLogi += (vol["vol_size"].to_f)/1024.0/1024.0/1024.0
+            else
+              rpVolCount += 1
+              rpVolConsumed += (vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0
+              rpVolTotalLogi += (vol["vol_size"].to_f)/1024.0/1024.0/1024.0
+            end
+          end
+        end
+      end
+
+      totalSourceVols = sourceVolCount.to_s.colorize(:light_white)
+      totalSourceConsumed = sourceVolConsumed.round(1).to_s.colorize(:light_white)
+      totalSnapVols = snapVolCount.to_s.colorize(:light_white)
+      totalSnapConsumed = snapVolConsumed.round(1).to_s.colorize(:light_white)
+      totalRpVols = rpVolCount.to_s.colorize(:light_white)
+      totalRpConsumed = rpVolConsumed.round(1).to_s.colorize(:light_white)
+      verboseRows << [clusterSerial,totalSourceVols,totalSourceConsumed,totalSnapVols,totalSnapConsumed,totalRpVols,totalRpConsumed]
+    end
+    return verboseRows
+  end
 end

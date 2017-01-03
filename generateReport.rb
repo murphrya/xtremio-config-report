@@ -11,7 +11,9 @@ include ReportEngine
 Process.setproctitle("XtremIO Configuration Report")
 jsonHash = DossierEngine.generateJsonHash(getFileLocation)
 clusterCount = DossierEngine.getClusterCount(jsonHash)
+flag =  DossierEngine.getFlags
 tableWidth = {:width => 100}
+tableWidth2 = {:width => 120}
 
 #Generate the XMS table
 xmsIp = DossierEngine.getXmsIp(jsonHash).colorize(:light_white)
@@ -43,10 +45,16 @@ efficiencyTitle = "Efficiency - All Clusters".colorize(:light_blue)
 efficiencyHeader = ['PSTN'.colorize(:cyan), 'Dedupe'.colorize(:cyan),'Compression'.colorize(:cyan),'DRR'.colorize(:cyan),'Thin Ratio'.colorize(:cyan),'Total Efficiency'.colorize(:cyan)]
 efficiencyRows = DossierEngine.generateEffRows(jsonHash,clusterCount)
 
+verboseTitle = "Verbose - All Clusters".colorize(:light_blue)
+verboseHeader = ['PSTN'.colorize(:cyan), 'Source Vols'.colorize(:cyan), 'Source Consumed (TB)'.colorize(:cyan), 'Snap Vols'.colorize(:cyan), 'Snap Consumed (TB)'.colorize(:cyan), 'RP Vols'.colorize(:cyan), 'RP Consumed (TB)'.colorize(:cyan)]
+verboseRows = ReportEngine.generateVerboseRows(jsonHash,clusterCount,allVolumes,allSnapshotGroups)
+
 configurationTable = ReportEngine.generateTable(configurationTitle,configurationHeader,configurationRows,tableWidth)
 physCapacityTable = ReportEngine.generateTable(physCapacityTitle,physCapacityHeader,physCapacityRows,tableWidth)
 logicalCapacityTable = ReportEngine.generateTable(logicalCapacityTitle,logicalCapacityHeader,logicalCapacityRows,tableWidth)
 efficiencyTable = ReportEngine.generateTable(efficiencyTitle,efficiencyHeader,efficiencyRows,tableWidth)
+verboseTable =  ReportEngine.generateTable(verboseTitle,verboseHeader,verboseRows,tableWidth2)
+
 
 #Print all tables to terminal
 ReportEngine.printHeader
@@ -55,4 +63,7 @@ ReportEngine.printTable(configurationTable)
 ReportEngine.printTable(physCapacityTable)
 ReportEngine.printTable(logicalCapacityTable)
 ReportEngine.printTable(efficiencyTable)
+if flag == true
+  ReportEngine.printTable(verboseTable)
+end
 ReportEngine.printFooter
