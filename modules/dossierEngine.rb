@@ -299,7 +299,7 @@ module DossierEngine
       clusterDrrNoSnap = (sourceMappedConsumed / clusterPhysConsumed).round(2).to_s.colorize(:light_white)
       clusterDrrWithSnap = ((sourceVolConsumed + snapVolConsumed) / clusterPhysConsumed).round(2).to_s.colorize(:light_white)
       clusterDrrOnlySnap = (snapVolConsumed / clusterPhysConsumed).round(2).to_s.colorize(:light_white)
-      drrRows << [clusterSerial,totalVols,totalLogical,totalConsumed,clusterDrrNoSnap,clusterDrrWithSnap,clusterDrrOnlySnap]
+      drrRows << [clusterSerial,totalVols,totalLogical,totalConsumed,clusterDrrNoSnap,clusterDrrOnlySnap,clusterDrrWithSnap]
     end
     return drrRows
   end

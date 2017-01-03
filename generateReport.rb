@@ -58,7 +58,7 @@ rpVerboseHeader = ['PSTN'.colorize(:cyan), 'Count'.colorize(:cyan), 'Logical Con
 rpVerboseRows = ReportEngine.generateRpVerboseRows(jsonHash,clusterCount,allVolumes,allSnapshotGroups)
 
 drrVerboseTitle = "Verbose - DRR".colorize(:light_blue)
-drrVerboseHeader = ['PSTN'.colorize(:cyan), 'Vols'.colorize(:cyan), 'Total Logical (TB)'.colorize(:cyan), "Logical Consumed (TB)".colorize(:cyan), "DRR - Source".colorize(:cyan), "DRR - All".colorize(:cyan), "DRR - Snap".colorize(:cyan)]
+drrVerboseHeader = ['PSTN'.colorize(:cyan), 'Vols'.colorize(:cyan), 'Total Logical (TB)'.colorize(:cyan), "Logical Consumed (TB)".colorize(:cyan), "DRR - Source".colorize(:cyan), "DRR - Snap".colorize(:cyan), "DRR - All".colorize(:cyan)]
 drrVerboseRows = ReportEngine.generateDrrVerboseRows(jsonHash,clusterCount,allVolumes,allSnapshotGroups)
 
 
