@@ -45,16 +45,31 @@ efficiencyTitle = "Efficiency - All Clusters".colorize(:light_blue)
 efficiencyHeader = ['PSTN'.colorize(:cyan), 'Dedupe'.colorize(:cyan),'Compression'.colorize(:cyan),'DRR'.colorize(:cyan),'Thin Ratio'.colorize(:cyan),'Total Efficiency'.colorize(:cyan)]
 efficiencyRows = DossierEngine.generateEffRows(jsonHash,clusterCount)
 
-verboseTitle = "Verbose - All Clusters".colorize(:light_blue)
-verboseHeader = ['PSTN'.colorize(:cyan), 'Source Vols'.colorize(:cyan), 'Source Consumed (TB)'.colorize(:cyan), 'Snap Vols'.colorize(:cyan), 'Snap Consumed (TB)'.colorize(:cyan), 'RP Vols'.colorize(:cyan), 'RP Consumed (TB)'.colorize(:cyan)]
-verboseRows = ReportEngine.generateVerboseRows(jsonHash,clusterCount,allVolumes,allSnapshotGroups)
+sourceVerboseTitle = "Verbose - Source Volumes".colorize(:light_blue)
+sourceVerboseHeader = ['PSTN'.colorize(:cyan), 'Count'.colorize(:cyan), 'Logical Consumed (TB)'.colorize(:cyan), "Mapped Logical Consumed (TB)".colorize(:cyan), "Total Logical (TB)".colorize(:cyan)]
+sourceVerboseRows = ReportEngine.generateSourceVerboseRows(jsonHash,clusterCount,allVolumes,allSnapshotGroups)
+
+snapVerboseTitle = "Verbose - Non-RP Snap Volumes".colorize(:light_blue)
+snapVerboseHeader = ['PSTN'.colorize(:cyan), 'Count'.colorize(:cyan), 'Logical Consumed (TB)'.colorize(:cyan), "Mapped Logical Consumed (TB)".colorize(:cyan), "Total Logical (TB)".colorize(:cyan)]
+snapVerboseRows = ReportEngine.generateSnapVerboseRows(jsonHash,clusterCount,allVolumes,allSnapshotGroups)
+
+rpVerboseTitle = "Verbose - RP Snap Volumes".colorize(:light_blue)
+rpVerboseHeader = ['PSTN'.colorize(:cyan), 'Count'.colorize(:cyan), 'Logical Consumed (TB)'.colorize(:cyan), "Mapped Logical Consumed (TB)".colorize(:cyan), "Total Logical (TB)".colorize(:cyan)]
+rpVerboseRows = ReportEngine.generateRpVerboseRows(jsonHash,clusterCount,allVolumes,allSnapshotGroups)
+
+drrVerboseTitle = "Verbose - DRR".colorize(:light_blue)
+drrVerboseHeader = ['PSTN'.colorize(:cyan), 'Vols'.colorize(:cyan), 'Total Logical (TB)'.colorize(:cyan), "Logical Consumed (TB)".colorize(:cyan), "DRR - Source".colorize(:cyan), "DRR - All".colorize(:cyan), "DRR - Snap".colorize(:cyan)]
+drrVerboseRows = ReportEngine.generateDrrVerboseRows(jsonHash,clusterCount,allVolumes,allSnapshotGroups)
+
 
 configurationTable = ReportEngine.generateTable(configurationTitle,configurationHeader,configurationRows,tableWidth)
 physCapacityTable = ReportEngine.generateTable(physCapacityTitle,physCapacityHeader,physCapacityRows,tableWidth)
 logicalCapacityTable = ReportEngine.generateTable(logicalCapacityTitle,logicalCapacityHeader,logicalCapacityRows,tableWidth)
 efficiencyTable = ReportEngine.generateTable(efficiencyTitle,efficiencyHeader,efficiencyRows,tableWidth)
-verboseTable =  ReportEngine.generateTable(verboseTitle,verboseHeader,verboseRows,tableWidth2)
-
+sourceVerboseTable =  ReportEngine.generateTable(sourceVerboseTitle,sourceVerboseHeader,sourceVerboseRows,tableWidth2)
+snapVerboseTable =  ReportEngine.generateTable(snapVerboseTitle,snapVerboseHeader,snapVerboseRows,tableWidth2)
+rpVerboseTable =  ReportEngine.generateTable(rpVerboseTitle,rpVerboseHeader,rpVerboseRows,tableWidth2)
+drrVerboseTable =  ReportEngine.generateTable(drrVerboseTitle,drrVerboseHeader,drrVerboseRows,tableWidth2)
 
 #Print all tables to terminal
 ReportEngine.printHeader
@@ -64,6 +79,9 @@ ReportEngine.printTable(physCapacityTable)
 ReportEngine.printTable(logicalCapacityTable)
 ReportEngine.printTable(efficiencyTable)
 if flag == true
-  ReportEngine.printTable(verboseTable)
+  ReportEngine.printTable(sourceVerboseTable)
+  ReportEngine.printTable(snapVerboseTable)
+  ReportEngine.printTable(rpVerboseTable)
+  ReportEngine.printTable(drrVerboseTable)
 end
 ReportEngine.printFooter

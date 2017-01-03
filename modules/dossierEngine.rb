@@ -156,51 +156,153 @@ module DossierEngine
     return efficiencyRows
   end
 
-
-  def generateVerboseRows(jsonHash,clusterCount,allVolumes,allSnapshotGroups)
+  #
+  def generateSourceVerboseRows(jsonHash,clusterCount,allVolumes,allSnapshotGroups)
     counter = 0
     sourceVolCount = 0
     sourceVolConsumed = 0.0
+    sourceMappedConsumed = 0.0
     sourceVolTotalLogi = 0.0
-    snapVolCount = 0
-    snapVolConsumed = 0.0
-    snapVolTotalLogi = 0.0
-    rpVolCount = 0
-    rpVolConsumed = 0.0
-    rpVolTotalLogi = 0.0
-    verboseRows = []
+    sourceRows = []
     clusterCount.times do
-      #Generate cluster configuration information
       clusterSerial = jsonHash["SystemsInfo"][counter]["psnt"].colorize(:light_white)
-      #totals for each volume type
       allVolumes.each do |vol|
         if vol["sys_id"][1] == jsonHash["Systems"][counter]["name"]
           if vol["created_from_volume"] == ""
             sourceVolCount += 1
             sourceVolConsumed += (vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0
             sourceVolTotalLogi += (vol["vol_size"].to_f)/1024.0/1024.0/1024.0
+            if vol["lun_mapping_list"].length > 0
+              sourceMappedConsumed += (vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0
+            end
+          end
+        end
+      end
+      totalSourceVols = sourceVolCount.to_s.colorize(:light_white)
+      totalSourceConsumed = sourceVolConsumed.round(1).to_s.colorize(:light_white)
+      totalSourceMappedConsumed = sourceMappedConsumed.round(1).to_s.colorize(:light_white)
+      totalLogical = sourceVolTotalLogi.round(1).to_s.colorize(:light_white)
+      sourceRows << [clusterSerial,totalSourceVols,totalSourceConsumed,totalSourceMappedConsumed,totalLogical]
+    end
+    return sourceRows
+  end
+
+  #
+  def generateSnapVerboseRows(jsonHash,clusterCount,allVolumes,allSnapshotGroups)
+    counter = 0
+    snapVolCount = 0
+    snapVolConsumed = 0.0
+    snapMappedConsumed = 0.0
+    snapVolTotalLogi = 0.0
+    snapRows = []
+    clusterCount.times do
+      clusterSerial = jsonHash["SystemsInfo"][counter]["psnt"].colorize(:light_white)
+      allVolumes.each do |vol|
+        if vol["sys_id"][1] == jsonHash["Systems"][counter]["name"]
+          if vol["created_from_volume"] == ""
           else
             if vol["created_by_app"] == ""
               snapVolCount += 1
               snapVolConsumed += (vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0
               snapVolTotalLogi += (vol["vol_size"].to_f)/1024.0/1024.0/1024.0
-            else
-              rpVolCount += 1
-              rpVolConsumed += (vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0
-              rpVolTotalLogi += (vol["vol_size"].to_f)/1024.0/1024.0/1024.0
+              if vol["lun_mapping_list"].length > 0
+                snapMappedConsumed += (vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0
+              end
             end
           end
         end
       end
 
-      totalSourceVols = sourceVolCount.to_s.colorize(:light_white)
-      totalSourceConsumed = sourceVolConsumed.round(1).to_s.colorize(:light_white)
       totalSnapVols = snapVolCount.to_s.colorize(:light_white)
       totalSnapConsumed = snapVolConsumed.round(1).to_s.colorize(:light_white)
+      totalSnapMappedConsumed = snapMappedConsumed.round(1).to_s.colorize(:light_white)
+      totalLogical = snapVolTotalLogi.round(1).to_s.colorize(:light_white)
+      snapRows << [clusterSerial,totalSnapVols,totalSnapConsumed,totalSnapMappedConsumed,totalLogical]
+    end
+    return snapRows
+  end
+
+  #
+  def generateRpVerboseRows(jsonHash,clusterCount,allVolumes,allSnapshotGroups)
+    counter = 0
+    rpVolCount = 0
+    rpVolConsumed = 0.0
+    rpMappedConsumed = 0.0
+    rpVolTotalLogi = 0.0
+    rpRows = []
+    clusterCount.times do
+      clusterSerial = jsonHash["SystemsInfo"][counter]["psnt"].colorize(:light_white)
+      allVolumes.each do |vol|
+        if vol["sys_id"][1] == jsonHash["Systems"][counter]["name"]
+          if vol["created_from_volume"] == ""
+          else
+            if vol["created_by_app"] == ""
+            else
+              rpVolCount += 1
+              rpVolConsumed += (vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0
+              rpVolTotalLogi += (vol["vol_size"].to_f)/1024.0/1024.0/1024.0
+              if vol["lun_mapping_list"].length > 0
+                rpMappedConsumed += (vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0
+              end
+            end
+          end
+        end
+      end
+
       totalRpVols = rpVolCount.to_s.colorize(:light_white)
       totalRpConsumed = rpVolConsumed.round(1).to_s.colorize(:light_white)
-      verboseRows << [clusterSerial,totalSourceVols,totalSourceConsumed,totalSnapVols,totalSnapConsumed,totalRpVols,totalRpConsumed]
+      totalRpMappedConsumed = rpMappedConsumed.round(1).to_s.colorize(:light_white)
+      totalLogical = rpVolTotalLogi.round(1).to_s.colorize(:light_white)
+      rpRows << [clusterSerial,totalRpVols,totalRpConsumed,totalRpMappedConsumed,totalLogical]
     end
-    return verboseRows
+    return rpRows
   end
+
+  #
+  def generateDrrVerboseRows(jsonHash,clusterCount,allVolumes,allSnapshotGroups)
+    counter = 0
+    sourceVolCount = 0
+    sourceVolConsumed = 0.0
+    sourceMappedConsumed = 0.0
+    sourceVolTotalLogi = 0.0
+    snapVolCount = 0
+    snapVolConsumed = 0.0
+    snapMappedConsumed = 0.0
+    snapVolTotalLogi = 0.0
+    drrRows = []
+    clusterCount.times do
+      clusterSerial = jsonHash["SystemsInfo"][counter]["psnt"].colorize(:light_white)
+      allVolumes.each do |vol|
+        if vol["sys_id"][1] == jsonHash["Systems"][counter]["name"]
+          if vol["created_from_volume"] == ""
+            sourceVolCount += 1
+            sourceVolConsumed += (vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0
+            sourceVolTotalLogi += (vol["vol_size"].to_f)/1024.0/1024.0/1024.0
+            if vol["lun_mapping_list"].length > 0
+              sourceMappedConsumed += (vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0
+            end
+          else
+            snapVolCount += 1
+            snapVolConsumed += (vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0
+            snapVolTotalLogi += (vol["vol_size"].to_f)/1024.0/1024.0/1024.0
+            if vol["lun_mapping_list"].length > 0
+              snapMappedConsumed += (vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0
+            end
+          end
+        end
+      end
+
+      totalVols = (sourceVolCount + snapVolCount).to_s.colorize(:light_white)
+      totalConsumed = (sourceVolConsumed + snapVolConsumed).round(1).to_s.colorize(:light_white)
+      totalMappedConsumed = (sourceMappedConsumed + snapMappedConsumed).round(1).to_s.colorize(:light_white)
+      totalLogical = (sourceVolTotalLogi + snapVolTotalLogi).round(1).to_s.colorize(:light_white)
+      clusterPhysConsumed = ((jsonHash["Systems"][counter]["ud_ssd_space_in_use"].to_f)/1024.0/1024.0/1024.0).round(1)
+      clusterDrrNoSnap = (sourceMappedConsumed / clusterPhysConsumed).round(1).to_s.colorize(:light_white)
+      clusterDrrWithSnap = ((sourceVolConsumed + snapVolConsumed) / clusterPhysConsumed).round(1).to_s.colorize(:light_white)
+      clusterDrrOnlySnap = (snapVolConsumed / clusterPhysConsumed).round(1).to_s.colorize(:light_white)
+      drrRows << [clusterSerial,totalVols,totalLogical,totalConsumed,clusterDrrNoSnap,clusterDrrWithSnap,clusterDrrOnlySnap]
+    end
+    return drrRows
+  end
+
 end
