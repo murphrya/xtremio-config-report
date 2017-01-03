@@ -121,8 +121,6 @@ module DossierEngine
         end
       end
       allVolumes.each do |vol|
-        puts vol["created_by_app"]
-        puts "------------------------------------------------------------------------------------------------------"
         if vol["sys_id"][1] == jsonHash["Systems"][counter]["name"]
           if vol["created_from_volume"] == ""
             sourceVolCount += 1
