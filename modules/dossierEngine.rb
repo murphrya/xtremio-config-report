@@ -1,5 +1,4 @@
 require 'json'
-
 module DossierEngine
   #Get the location of the json file from the user
   def getFileLocation
@@ -61,4 +60,91 @@ module DossierEngine
   def getAllSnapshotGroups(jsonHash)
     return jsonHash["AllSnapshotGroups"]
   end
+
+  #generate config rows
+  def generateConfigurationRows(jsonHash,clusterCount)
+    counter = 0
+    configurationRows = []
+    clusterCount.times do
+      clusterSerial = jsonHash["SystemsInfo"][counter]["psnt"].colorize(:light_white)
+      clusterName = jsonHash["Systems"][counter]["name"].colorize(:light_white)
+      clusterCode = jsonHash["SystemsInfo"][counter]["sys_sw_version"].colorize(:light_white)
+      clusterType = jsonHash["Systems"][counter]["size_and_capacity"].colorize(:light_white)
+      clusterState = jsonHash["AllSystems"][counter]["sys_health_state"].colorize(:light_white)
+      clusterMajorAlerts = jsonHash["AllSystems"][counter]["num_of_major_alerts"].to_s.colorize(:light_white)
+      configurationRows << [clusterSerial, clusterName, clusterCode, clusterType, clusterState,clusterMajorAlerts]
+    end
+    return configurationRows
+  end
+
+  #generate phys capacity rows
+  def generatePhysCapRows(jsonHash,clusterCount)
+    ##### Generate the clusters configuration table rows#####
+    counter = 0
+    physCapacityRows = []
+    clusterCount.times do
+      #Generate cluster configuration information
+      clusterSerial = jsonHash["SystemsInfo"][counter]["psnt"].colorize(:light_white)
+      clusterPhysConsumed = (((jsonHash["Systems"][counter]["ud_ssd_space_in_use"]).to_f)/1024.0/1024.0/1024.0).round(1).to_s.colorize(:light_white)
+      clusterPhysFree = (((jsonHash["AllSystems"][counter]["free_ud_ssd_space"]).to_f)/1024.0/1024.0/1024.0).round(1).to_s.colorize(:light_white)
+      clusterPhysUsable = (((jsonHash["Systems"][counter]["ud_ssd_space"]).to_f)/1024.0/1024.0/1024.0).round(1).to_s.colorize(:light_white)
+      physCapacityRows << [clusterSerial,clusterPhysUsable,clusterPhysConsumed,clusterPhysFree]
+    end
+    return physCapacityRows
+  end
+
+  #generate logical capacity rows
+  def generateLogiCapRows(jsonHash,clusterCount,allVolumes,allSnapshotGroups)
+    counter = 0
+    logicalCapacityRows = []
+    sourceVolCount = 0
+    snapVolCount = 0
+    clusterCount.times do
+      clusterSerial = jsonHash["SystemsInfo"][counter]["psnt"].colorize(:light_white)
+      clusterSvgCount = 0
+      clusterSvgConsumed = 0.0
+      clusterSvgTotalLogical = 0.0
+      allSnapshotGroups.each do |sg|
+        if sg["sys_id"][1] == jsonHash["Systems"][counter]["name"]
+          clusterSvgCount += 1
+          clusterSvgConsumed += (sg["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0
+          clusterSvgTotalLogical += (sg["vol_size"].to_f)/1024.0/1024.0/1024.0
+        end
+      end
+      allVolumes.each do |vol|
+        if vol["sys_id"][1] == jsonHash["Systems"][counter]["name"]
+          if vol["created_from_volume"] == ""
+            sourceVolCount += 1
+          else
+            snapVolCount += 1
+          end
+        end
+      end
+      clusterSvgTotal = clusterSvgCount.to_s.colorize(:light_white)
+      clusterLogicalConsumed= clusterSvgConsumed.round(1).to_s.colorize(:light_white)
+      clusterTotalLogical = clusterSvgTotalLogical.round(1).to_s.colorize(:light_white)
+      sourceVolTotal = sourceVolCount.to_s.colorize(:light_white)
+      snapVolTotal = snapVolCount.to_s.colorize(:light_white)
+      logicalCapacityRows << [clusterSerial,clusterSvgTotal,clusterLogicalConsumed,clusterTotalLogical,sourceVolTotal,snapVolTotal]
+    end
+    return logicalCapacityRows
+  end
+
+  #generate eff rows
+  def generateEffRows(jsonHash,clusterCount)
+    counter = 0
+    efficiencyRows = []
+    clusterCount.times do
+      #Generate cluster configuration information
+      clusterSerial = jsonHash["SystemsInfo"][counter]["psnt"].colorize(:light_white)
+      clusterDedupe = jsonHash["AllSystems"][counter]["dedup_ratio"].round(1).to_s.colorize(:light_white)
+      clusterCompression = jsonHash["AllSystems"][counter]["compression_factor"].round(1).to_s.colorize(:light_white)
+      clusterDRR = jsonHash["AllSystems"][counter]["data_reduction_ratio"].round(1).to_s.colorize(:light_white)
+      clusterThinRatio = jsonHash["AllSystems"][counter]["thin_provisioning_ratio"].round(1).to_s.colorize(:light_white)
+      clusterOverallEff = jsonHash["AllSystems"][counter]["overall_efficiency_ratio"].round(1).to_s.colorize(:light_white)
+      efficiencyRows << [clusterSerial,clusterDedupe,clusterCompression,clusterDRR,clusterThinRatio,clusterOverallEff]
+    end
+    return efficiencyRows
+  end
+
 end
