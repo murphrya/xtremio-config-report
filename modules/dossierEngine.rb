@@ -14,19 +14,51 @@ module DossierEngine
     end
   end
 
+  #
+  def getDossierCount(location)
+    dossierFiles = Dir[location+"*"]
+  end
+
+  #
+  def unpackMultipleDossierJson(location)
+    dossierCount = getDossierCount(location).length
+    counter = 1
+    multipleJsonArray = []
+    dossierFiles = Dir[location+"*"]
+    puts "[Status] - There are #{dossierCount} files that will be unpacked"
+    dossierFiles.each do |dossier|
+      puts "[Status] - Unpacking dossier file #{counter}"
+      %x[unzip #{dossier} -d temp1x2y3z4]
+      filenames = Dir["temp1x2y3z4/*"]
+      filenames.each do |filename|
+        if filename.include? ".bz2"
+          %x[mkdir temp2a3b4c5]
+          %x[tar -xvf #{filename} -C temp2a3b4c5]
+        end
+      end
+      json = JSON.parse(File.read('temp2a3b4c5/small/xms/xmcli/show_all.json'))
+      multipleJsonArray.push(json)
+      %x[rm -rf temp1x2y3z4]
+      %x[rm -rf temp2a3b4c5]
+      counter += 1
+      sleep(2)
+    end
+    return multipleJsonArray
+  end
+
   #Opens dossier file and pulls out the json data
   def unpackDossieJson(location)
-    %x[unzip #{location} -d tempdir]
-    filenames = Dir["tempdir/*"]
+    %x[unzip #{location} -d temp1x2y3z4]
+    filenames = Dir["temp1x2y3z4/*"]
     filenames.each do |filename|
       if filename.include? ".bz2"
-        %x[mkdir tempdir2]
-        %x[tar -xvf #{filename} -C tempdir2]
+        %x[mkdir temp2a3b4c5]
+        %x[tar -xvf #{filename} -C temp2a3b4c5]
       end
     end
-    json = JSON.parse(File.read('tempdir2/small/xms/xmcli/show_all.json'))
-    %x[rm -rf tempdir]
-    %x[rm -rf tempdir2]
+    json = JSON.parse(File.read('temp2a3b4c5/small/xms/xmcli/show_all.json'))
+    %x[rm -rf temp1x2y3z4]
+    %x[rm -rf temp2a3b4c5]
     return json
   end
 
@@ -44,6 +76,7 @@ module DossierEngine
       return unpackDossieJson(location)
     end
   end
+
 
   #Return the number of XtremIO clusters connected to the XMS server
   def getClusterCount(jsonHash)
@@ -304,4 +337,7 @@ module DossierEngine
     return drrRows
   end
 
+  def generateBasicInfo(jsonHash,clusterCount,allVolumes,allSnapshotGroups)
+
+  end
 end
