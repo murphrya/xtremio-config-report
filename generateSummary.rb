@@ -128,7 +128,7 @@ totalSnapDRR = (totalSnapLogicalConsumed / totalPhysConsumed).round(2)
 totalCombinedDRR = (totalCombinedLogicalConsumed / totalPhysConsumed).round(2)
 
 CSV.open("dossierSummary.csv", "w") do |csv|
-  csv <<["XtremIO Summary Report - " + Time.now.strftime('%m/%d/%Y - %H:%M:%S')]
+  csv <<["XtremIO Summary Report:", Time.now.strftime('%m/%d/%Y - %H:%M:%S')]
   csv <<[" "]
   csv <<[" "]
   csv <<["Basic Cluster Information"]
