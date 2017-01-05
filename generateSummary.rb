@@ -30,7 +30,7 @@ multipleJsonArray.each do |jsonHash|
 
   #for each cluster in the dossier file
   clusterCount.times do
-    clusterData = DossierEngine.getClusterData(counter,jsonHash,allVolumes,allSnapshotGroups)
+    clusterData = DossierEngine.getClusterData(counter,jsonHash,allVolumes,allSnapshotGroups,location)
     puts "[Status] - Starting #{clusterData[:pstn]} analysis"
     if clusterData[:code] != '3.x'
       clustersArray.push(clusterData)

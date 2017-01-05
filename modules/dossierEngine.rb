@@ -60,7 +60,19 @@ module DossierEngine
   end
 
   #
-  def getClusterData(counter,jsonHash,allVolumes,allSnapshotGroups)
+  def getDossierTimestamp(location,pstn)
+    timestamp = nil
+    dossierFiles = Dir[location+"*"]
+    dossierFiles.each do |dossier|
+      if dossier.include? pstn
+        timestamp = dossier
+      end
+    end
+    return timestamp
+  end
+
+  #
+  def getClusterData(counter,jsonHash,allVolumes,allSnapshotGroups,location)
     clusterData = nil
     clusterCode = jsonHash["SystemsInfo"][counter]["sys_sw_version"]
     clusterSerial = jsonHash["SystemsInfo"][counter]["psnt"]
@@ -116,6 +128,8 @@ module DossierEngine
         end
       end
 
+      #get the dossier file age
+      dossierTimestamp = getDossierTimestamp(location,clusterSerial)
 
       #verbose
       combinedLogicalConsumed = (clusterSourceVolLogicalConsumed + clusterSnapVolLogicalConsumed).round(2)
@@ -123,7 +137,7 @@ module DossierEngine
       snapDRR = (clusterSnapVolLogicalConsumed / clusterPhysConsumed).round(2)
       combinedDRR = ((clusterSourceVolLogicalConsumed+clusterSnapVolLogicalConsumed) / clusterPhysConsumed).round(2)
 
-      clusterData = {:pstn => clusterSerial, :name => clusterName, :code => clusterCode, :type => clusterType, :state => clusterState,
+      clusterData = {:pstn => clusterSerial, :name => clusterName, :timestamp => dossierTimestamp, :code => clusterCode, :type => clusterType, :state => clusterState,
                      :physUsable => clusterPhysUsable, :physConsumed => clusterPhysConsumed, :physFree => clusterPhysFree, :percFull => clusterPercFull,
                      :logicalConsumed => clusterSvgConsumed, :totalLogical => clusterSvgTotalLogical, :sourceVolCount => clusterSourceVolCount, :snapVolCount => clusterSnapVolCount,
                      :dedupe => clusterDedupe, :compression => clusterCompression, :drr => clusterDRR, :thinRatio => clusterThinRatio, :overallEff => clusterOverallEff,
@@ -182,11 +196,11 @@ module DossierEngine
       csv <<[" "]
       csv <<[" "]
       csv <<["Basic Cluster Information"]
-      csv <<["Serial Number", "Cluster Name", "Cluster Code", "Cluster Type", "Cluster State", "Physical Usable (TB)", "Physical Consumed (TB)", "Physical Free (TB)", "% Full",
+      csv <<["Serial Number", "Cluster Name", "Dossier Date","Cluster Code", "Cluster Type", "Cluster State", "Physical Usable (TB)", "Physical Consumed (TB)", "Physical Free (TB)", "% Full",
              "Logical Consumed (TB)", "Total Logical (TB)", "Source Vol Count", "Snap Vol Count",
              "Dedupe", "Compression", "DRR", "Thin Ratio", "Overall Efficiency"]
       clustersArray.each do |clusterData|
-        csv << [clusterData[:pstn], clusterData[:name], clusterData[:code], clusterData[:type], clusterData[:state], clusterData[:physUsable], clusterData[:physConsumed],
+        csv << [clusterData[:pstn], clusterData[:name], clusterData[:timestamp], clusterData[:code], clusterData[:type], clusterData[:state], clusterData[:physUsable], clusterData[:physConsumed],
                 clusterData[:physFree], clusterData[:percFull], clusterData[:logicalConsumed], clusterData[:totalLogical], clusterData[:sourceVolCount], clusterData[:snapVolCount],
                 clusterData[:dedupe], clusterData[:compression], clusterData[:drr], clusterData[:thinRatio], clusterData[:overallEff]]
       end
