@@ -42,81 +42,86 @@ multipleJsonArray.each do |jsonHash|
   puts "[Status] - Generating XtremIO Summary from dossier #{dossierCount}"
   #for each cluster in the dossier file
   clusterCount.times do
-    clusterSerial = jsonHash["SystemsInfo"][counter]["psnt"]
-    clusterName = jsonHash["Systems"][counter]["name"]
     clusterCode = jsonHash["SystemsInfo"][counter]["sys_sw_version"]
-    clusterType = jsonHash["Systems"][counter]["size_and_capacity"]
-    clusterState = jsonHash["AllSystems"][counter]["sys_health_state"]
-    clusterPhysConsumed = (((jsonHash["Systems"][counter]["ud_ssd_space_in_use"]).to_f)/1024.0/1024.0/1024.0).round(2)
-    clusterPhysFree = (((jsonHash["AllSystems"][counter]["free_ud_ssd_space"]).to_f)/1024.0/1024.0/1024.0).round(2)
-    clusterPhysUsable = (((jsonHash["Systems"][counter]["ud_ssd_space"]).to_f)/1024.0/1024.0/1024.0).round(2)
-    clusterPercFull = ((clusterPhysConsumed / clusterPhysUsable ) * 100).round(2)
-    clusterSvgCount = 0
-    clusterSvgConsumed = 0.0
-    clusterSvgTotalLogical = 0.0
-    clusterSourceVolCount = 0
-    clusterSnapVolCount = 0
-    clusterDedupe = jsonHash["AllSystems"][counter]["dedup_ratio"].round(2)
-    clusterCompression = jsonHash["AllSystems"][counter]["compression_factor"].round(2)
-    clusterDRR = jsonHash["AllSystems"][counter]["data_reduction_ratio"].round(2)
-    clusterThinRatio = jsonHash["AllSystems"][counter]["thin_provisioning_ratio"].round(2)
-    clusterOverallEff = jsonHash["AllSystems"][counter]["overall_efficiency_ratio"].round(2)
-    clusterSourceVolLogicalConsumed = 0.0
-    clusterSourceVolTotalLogical = 0.0
-    clusterSnapVolLogicalConsumed = 0.0
-    clusterSnapVolTotalLogical = 0.0
+    if clusterCode.include? '3.0.'
+      pstn = jsonHash["SystemsInfo"][counter]["psnt"]
+      puts "Skipping #{pstn} because it is a 3.x cluster"
+    else
+      clusterSerial = jsonHash["SystemsInfo"][counter]["psnt"]
+      clusterName = jsonHash["Systems"][counter]["name"]
+      clusterType = jsonHash["Systems"][counter]["size_and_capacity"]
+      clusterState = jsonHash["AllSystems"][counter]["sys_health_state"]
+      clusterPhysConsumed = (((jsonHash["Systems"][counter]["ud_ssd_space_in_use"]).to_f)/1024.0/1024.0/1024.0).round(2)
+      clusterPhysFree = (((jsonHash["AllSystems"][counter]["free_ud_ssd_space"]).to_f)/1024.0/1024.0/1024.0).round(2)
+      clusterPhysUsable = (((jsonHash["Systems"][counter]["ud_ssd_space"]).to_f)/1024.0/1024.0/1024.0).round(2)
+      clusterPercFull = ((clusterPhysConsumed / clusterPhysUsable ) * 100).round(2)
+      clusterSvgCount = 0
+      clusterSvgConsumed = 0.0
+      clusterSvgTotalLogical = 0.0
+      clusterSourceVolCount = 0
+      clusterSnapVolCount = 0
+      clusterDedupe = jsonHash["AllSystems"][counter]["dedup_ratio"].round(2)
+      clusterCompression = jsonHash["AllSystems"][counter]["compression_factor"].round(2)
+      clusterDRR = jsonHash["AllSystems"][counter]["data_reduction_ratio"].round(2)
+      clusterThinRatio = jsonHash["AllSystems"][counter]["thin_provisioning_ratio"].round(2)
+      clusterOverallEff = jsonHash["AllSystems"][counter]["overall_efficiency_ratio"].round(2)
+      clusterSourceVolLogicalConsumed = 0.0
+      clusterSourceVolTotalLogical = 0.0
+      clusterSnapVolLogicalConsumed = 0.0
+      clusterSnapVolTotalLogical = 0.0
 
-    #generate logical consumed and total logical
-    allSnapshotGroups.each do |sg|
-      if sg["sys_id"][1] == jsonHash["Systems"][counter]["name"]
-        clusterSvgCount += 1
-        clusterSvgConsumed += ((sg["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0).round(2)
-        clusterSvgTotalLogical += ((sg["vol_size"].to_f)/1024.0/1024.0/1024.0).round(2)
-      end
-    end
-
-    #generate source and snap count
-    allVolumes.each do |vol|
-      if vol["sys_id"][1] == jsonHash["Systems"][counter]["name"]
-        if vol["created_from_volume"] == ""
-          clusterSourceVolCount += 1
-          clusterSourceVolLogicalConsumed += ((vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0).round(2)
-          clusterSourceVolTotalLogical += ((vol["vol_size"].to_f)/1024.0/1024.0/1024.0).round(2)
-          totalSourceLogicalConsumed += ((vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0).round(2)
-
-        else
-          clusterSnapVolCount += 1
-          clusterSnapVolLogicalConsumed += ((vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0).round(2)
-          clusterSnapVolTotalLogical += ((vol["vol_size"].to_f)/1024.0/1024.0/1024.0).round(2)
-          totalSnapLogicalConsumed += ((vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0).round(2)
+      #generate logical consumed and total logical
+      allSnapshotGroups.each do |sg|
+        if sg["sys_id"][1] == jsonHash["Systems"][counter]["name"]
+          clusterSvgCount += 1
+          clusterSvgConsumed += ((sg["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0).round(2)
+          clusterSvgTotalLogical += ((sg["vol_size"].to_f)/1024.0/1024.0/1024.0).round(2)
         end
       end
+
+      #generate source and snap count
+      allVolumes.each do |vol|
+        if vol["sys_id"][1] == jsonHash["Systems"][counter]["name"]
+          if vol["created_from_volume"] == ""
+            clusterSourceVolCount += 1
+            clusterSourceVolLogicalConsumed += ((vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0).round(2)
+            clusterSourceVolTotalLogical += ((vol["vol_size"].to_f)/1024.0/1024.0/1024.0).round(2)
+            totalSourceLogicalConsumed += ((vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0).round(2)
+
+          else
+            clusterSnapVolCount += 1
+            clusterSnapVolLogicalConsumed += ((vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0).round(2)
+            clusterSnapVolTotalLogical += ((vol["vol_size"].to_f)/1024.0/1024.0/1024.0).round(2)
+            totalSnapLogicalConsumed += ((vol["logical_space_in_use"].to_f)/1024.0/1024.0/1024.0).round(2)
+          end
+        end
+      end
+
+      #add to totals
+      totalPhysUsable += clusterPhysUsable
+      totalPhysConsumed += clusterPhysConsumed
+      totalPhysFree += clusterPhysFree
+      totalSvgConsumed += clusterSvgConsumed
+      totalSvgTotalLogical += clusterSvgTotalLogical
+      totalSourceVolCount += clusterSourceVolCount
+      totalSnapVolCount += clusterSnapVolCount
+
+
+      #verbose
+      combinedLogicalConsumed = (clusterSourceVolLogicalConsumed + clusterSnapVolLogicalConsumed).round(2)
+      sourceDRR = (clusterSourceVolLogicalConsumed / clusterPhysConsumed).round(2)
+      snapDRR = (clusterSnapVolLogicalConsumed / clusterPhysConsumed).round(2)
+      combinedDRR = ((clusterSourceVolLogicalConsumed+clusterSnapVolLogicalConsumed) / clusterPhysConsumed).round(2)
+
+      clusterData = {:pstn => clusterSerial, :name => clusterName, :code => clusterCode, :type => clusterType, :state => clusterState,
+                     :physUsable => clusterPhysUsable, :physConsumed => clusterPhysConsumed, :physFree => clusterPhysFree, :percFull => clusterPercFull,
+                     :logicalConsumed => clusterSvgConsumed, :totalLogical => clusterSvgTotalLogical, :sourceVolCount => clusterSourceVolCount, :snapVolCount => clusterSnapVolCount,
+                     :dedupe => clusterDedupe, :compression => clusterCompression, :drr => clusterDRR, :thinRatio => clusterThinRatio, :overallEff => clusterOverallEff,
+                     :sourceLogicalConsumed => clusterSourceVolLogicalConsumed, :snapLogicalConsumed => clusterSnapVolLogicalConsumed, :combinedLogicalConsumed => combinedLogicalConsumed,
+                     :sourceDRR => sourceDRR, :snapDRR => snapDRR, :combinedDRR => combinedDRR}
+      clustersArray.push(clusterData)
+      counter += 1
     end
-
-    #add to totals
-    totalPhysUsable += clusterPhysUsable
-    totalPhysConsumed += clusterPhysConsumed
-    totalPhysFree += clusterPhysFree
-    totalSvgConsumed += clusterSvgConsumed
-    totalSvgTotalLogical += clusterSvgTotalLogical
-    totalSourceVolCount += clusterSourceVolCount
-    totalSnapVolCount += clusterSnapVolCount
-
-
-    #verbose
-    combinedLogicalConsumed = (clusterSourceVolLogicalConsumed + clusterSnapVolLogicalConsumed).round(2)
-    sourceDRR = (clusterSourceVolLogicalConsumed / clusterPhysConsumed).round(2)
-    snapDRR = (clusterSnapVolLogicalConsumed / clusterPhysConsumed).round(2)
-    combinedDRR = ((clusterSourceVolLogicalConsumed+clusterSnapVolLogicalConsumed) / clusterPhysConsumed).round(2)
-
-    clusterData = {:pstn => clusterSerial, :name => clusterName, :code => clusterCode, :type => clusterType, :state => clusterState,
-                   :physUsable => clusterPhysUsable, :physConsumed => clusterPhysConsumed, :physFree => clusterPhysFree, :percFull => clusterPercFull,
-                   :logicalConsumed => clusterSvgConsumed, :totalLogical => clusterSvgTotalLogical, :sourceVolCount => clusterSourceVolCount, :snapVolCount => clusterSnapVolCount,
-                   :dedupe => clusterDedupe, :compression => clusterCompression, :drr => clusterDRR, :thinRatio => clusterThinRatio, :overallEff => clusterOverallEff,
-                   :sourceLogicalConsumed => clusterSourceVolLogicalConsumed, :snapLogicalConsumed => clusterSnapVolLogicalConsumed, :combinedLogicalConsumed => combinedLogicalConsumed,
-                   :sourceDRR => sourceDRR, :snapDRR => snapDRR, :combinedDRR => combinedDRR}
-    clustersArray.push(clusterData)
-    counter += 1
   end
   dossierCount += 1
 end

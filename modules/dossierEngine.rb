@@ -35,13 +35,19 @@ module DossierEngine
     puts dossierFiles
     dossierFiles.each do |dossier|
       puts "[Status] - Unpacking dossier file #{counter}"
-      Dir.mkdir 'temp2a3b4c5'
+
 
       %x[unzip #{dossier} -d temp1x2y3z4]
 
       filenames = Dir["temp1x2y3z4/*"]
+      puts filenames
       filenames.each do |filename|
         if filename.include? ".bz2"
+          Dir.mkdir 'temp2a3b4c5'
+          %x[tar -xvf #{filename} -C temp2a3b4c5]
+        end
+        if filename.include? ".tar.gz"
+          Dir.mkdir 'temp2a3b4c5'
           %x[tar -xvf #{filename} -C temp2a3b4c5]
         end
       end
