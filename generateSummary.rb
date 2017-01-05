@@ -41,13 +41,15 @@ multipleJsonArray.each do |jsonHash|
 
   puts "[Status] - Generating XtremIO Summary from dossier #{dossierCount}"
   #for each cluster in the dossier file
+  puts jsonHash["AllSystems"].length
   clusterCount.times do
     clusterCode = jsonHash["SystemsInfo"][counter]["sys_sw_version"]
     if clusterCode.include? '3.0.'
       pstn = jsonHash["SystemsInfo"][counter]["psnt"]
-      puts "Skipping #{pstn} because it is a 3.x cluster"
+      puts "[Warning] - Skipping #{pstn} because it is a 3.x cluster"
     else
       clusterSerial = jsonHash["SystemsInfo"][counter]["psnt"]
+      puts "[Status] - Starting #{clusterSerial} analysis"
       clusterName = jsonHash["Systems"][counter]["name"]
       clusterType = jsonHash["Systems"][counter]["size_and_capacity"]
       clusterState = jsonHash["AllSystems"][counter]["sys_health_state"]
@@ -120,8 +122,9 @@ multipleJsonArray.each do |jsonHash|
                      :sourceLogicalConsumed => clusterSourceVolLogicalConsumed, :snapLogicalConsumed => clusterSnapVolLogicalConsumed, :combinedLogicalConsumed => combinedLogicalConsumed,
                      :sourceDRR => sourceDRR, :snapDRR => snapDRR, :combinedDRR => combinedDRR}
       clustersArray.push(clusterData)
-      counter += 1
+
     end
+    counter += 1
   end
   dossierCount += 1
 end

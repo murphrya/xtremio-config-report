@@ -32,7 +32,6 @@ module DossierEngine
     multipleJsonArray = []
     dossierFiles = Dir[location+"*"]
     puts "[Status] - There are #{dossierCount} files that will be unpacked:"
-    puts dossierFiles
     dossierFiles.each do |dossier|
       puts "[Status] - Unpacking dossier file #{counter}"
 
@@ -40,7 +39,6 @@ module DossierEngine
       %x[unzip #{dossier} -d temp1x2y3z4]
 
       filenames = Dir["temp1x2y3z4/*"]
-      puts filenames
       filenames.each do |filename|
         if filename.include? ".bz2"
           Dir.mkdir 'temp2a3b4c5'
@@ -95,7 +93,7 @@ module DossierEngine
 
   #Return the number of XtremIO clusters connected to the XMS server
   def getClusterCount(jsonHash)
-    return jsonHash["AllXms"][0]["num_of_systems"].to_i
+    return jsonHash["AllSystems"].length.to_i
   end
 
   #Return the XMS server IP address
