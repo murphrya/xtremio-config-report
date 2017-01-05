@@ -20,6 +20,11 @@ module DossierEngine
   end
 
   #
+  def generateCSVFilename(location)
+    return location + "dossierSummary.csv"
+  end
+
+  #
   def unpackMultipleDossierJson(location)
     dossierCount = getDossierCount(location).length
     counter = 1

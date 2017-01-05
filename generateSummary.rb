@@ -128,7 +128,9 @@ totalSourceDRR = (totalSourceLogicalConsumed / totalPhysConsumed).round(2)
 totalSnapDRR = (totalSnapLogicalConsumed / totalPhysConsumed).round(2)
 totalCombinedDRR = (totalCombinedLogicalConsumed / totalPhysConsumed).round(2)
 
-CSV.open("dossierSummary.csv", "w") do |csv|
+
+
+CSV.open(DossierEngine.generateCSVFilename(location), "w") do |csv|
   csv <<["XtremIO Summary Report:", Time.now.strftime('%m/%d/%Y - %H:%M:%S')]
   csv <<[" "]
   csv <<[" "]
