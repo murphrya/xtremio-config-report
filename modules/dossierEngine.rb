@@ -1,4 +1,5 @@
 require 'json'
+require 'fileutils'
 module DossierEngine
   #Get the location of the json file from the user
   def getFileLocation
@@ -30,21 +31,24 @@ module DossierEngine
     counter = 1
     multipleJsonArray = []
     dossierFiles = Dir[location+"*"]
-    puts "[Status] - There are #{dossierCount} files that will be unpacked"
+    puts "[Status] - There are #{dossierCount} files that will be unpacked:"
+    puts dossierFiles
     dossierFiles.each do |dossier|
       puts "[Status] - Unpacking dossier file #{counter}"
+      Dir.mkdir 'temp2a3b4c5'
+
       %x[unzip #{dossier} -d temp1x2y3z4]
+
       filenames = Dir["temp1x2y3z4/*"]
       filenames.each do |filename|
         if filename.include? ".bz2"
-          %x[mkdir temp2a3b4c5]
           %x[tar -xvf #{filename} -C temp2a3b4c5]
         end
       end
       json = JSON.parse(File.read('temp2a3b4c5/small/xms/xmcli/show_all.json'))
       multipleJsonArray.push(json)
-      %x[rm -rf temp1x2y3z4]
-      %x[rm -rf temp2a3b4c5]
+      FileUtils.rm_rf 'temp1x2y3z4'
+      FileUtils.rm_rf 'temp2a3b4c5'
       counter += 1
       sleep(2)
     end
