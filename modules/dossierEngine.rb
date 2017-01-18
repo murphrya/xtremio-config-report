@@ -15,6 +15,10 @@ module DossierEngine
     end
   end
 
+  def formatLocation(location)
+    return location.gsub("\\","/")
+  end
+
   #
   def getDossierCount(location)
     dossierFiles = Dir[location+"*"]
@@ -65,7 +69,13 @@ module DossierEngine
     dossierFiles = Dir[location+"*"]
     dossierFiles.each do |dossier|
       if dossier.include? pstn
-        timestamp = dossier
+        filenameArray = dossier.split("/")
+        filenameArray.each do |part|
+          if part.include? "FNM00"
+            filenameComponents = part.split("_")
+            timestamp = filenameComponents[3]
+          end
+        end
       end
     end
     return timestamp

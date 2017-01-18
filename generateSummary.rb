@@ -10,7 +10,8 @@ include ReportEngine
 
 #Generate Variables Used by multiple clusters
 Process.setproctitle("XtremIO Summary Report")
-location = DossierEngine.getFileLocation
+rawLocation = DossierEngine.getFileLocation
+location = DossierEngine.formatLocation(rawLocation)
 dossierCount = DossierEngine.getDossierCount(location)
 multipleJsonArray = DossierEngine.unpackMultipleDossierJson(location)
 
