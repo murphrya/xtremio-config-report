@@ -214,7 +214,7 @@ module DossierEngine
                 clusterData[:physFree], clusterData[:percFull], clusterData[:logicalConsumed], clusterData[:totalLogical], clusterData[:sourceVolCount], clusterData[:snapVolCount],
                 clusterData[:dedupe], clusterData[:compression], clusterData[:drr], clusterData[:thinRatio], clusterData[:overallEff]]
       end
-      csv <<["Totals","-","-","-","-",totalsHash[:totalPhysUsable],totalsHash[:totalPhysConsumed],totalsHash[:totalPhysFree],"-",totalsHash[:totalSvgConsumed],totalsHash[:totalSvgTotalLogical],totalsHash[:totalSourceVolCount],totalsHash[:totalSnapVolCount],
+      csv <<["Totals","-","-","-","-","-",totalsHash[:totalPhysUsable],totalsHash[:totalPhysConsumed],totalsHash[:totalPhysFree],"-",totalsHash[:totalSvgConsumed],totalsHash[:totalSvgTotalLogical],totalsHash[:totalSourceVolCount],totalsHash[:totalSnapVolCount],
              "-", "-", totalsHash[:totalDRR],"-","-"]
 
       #if verbose flag is set
