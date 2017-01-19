@@ -77,6 +77,10 @@ module DossierEngine
             filenameComponents = part.split("_")
             timestamp = filenameComponents[3]
           end
+          if part.include? "APM00"
+            filenameComponents = part.split("_")
+            timestamp = filenameComponents[3]
+          end
         end
       end
     end
@@ -278,8 +282,6 @@ module DossierEngine
   def getAllSnapshotGroups(jsonHash)
     return jsonHash["AllSnapshotGroups"]
   end
-
-
 
 
 
