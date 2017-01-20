@@ -1,5 +1,6 @@
 require 'json'
 require 'fileutils'
+require 'colorize'
 module DossierEngine
 
   #Get the location of the json file from the user
@@ -8,8 +9,17 @@ module DossierEngine
   end
 
   #Get the location of the json file from the user
-  def getFlags
-    if ARGV[1] == "verbose"
+  def getVerboseFlag
+    if ARGV[2] == "verbose"
+      return true
+    else
+      return false
+    end
+  end
+
+  #Get the location of the json file from the user
+  def getCliFlag
+    if ARGV[1] == "cli"
       return true
     else
       return false
@@ -207,32 +217,62 @@ module DossierEngine
 
   #
   def generateSummaryCSV(clustersArray,totalsHash,location)
-    CSV.open(DossierEngine.generateCSVFilename(location), "w") do |csv|
-      csv <<["XtremIO Summary Report:", Time.now.strftime('%m/%d/%Y - %H:%M:%S')]
-      csv <<[" "]
-      csv <<[" "]
-      csv <<["Basic Cluster Information"]
-      csv <<["Serial Number", "Cluster Name", "Dossier Date","Cluster Code", "Cluster Type", "Cluster State", "Physical Usable (TB)", "Physical Consumed (TB)", "Physical Free (TB)", "% Full",
-             "Logical Consumed (TB)", "Total Logical (TB)", "Source Vol Count", "Snap Vol Count",
-             "Dedupe", "Compression", "DRR", "Thin Ratio", "Overall Efficiency"]
+    if DossierEngine.getCliFlag == true
+      counter = 1
+      puts " "
       clustersArray.each do |clusterData|
-        csv << [clusterData[:pstn], clusterData[:name], clusterData[:timestamp], clusterData[:code], clusterData[:type], clusterData[:state], clusterData[:physUsable], clusterData[:physConsumed],
-                clusterData[:physFree], clusterData[:percFull], clusterData[:logicalConsumed], clusterData[:totalLogical], clusterData[:sourceVolCount], clusterData[:snapVolCount],
-                clusterData[:dedupe], clusterData[:compression], clusterData[:drr], clusterData[:thinRatio], clusterData[:overallEff]]
+        puts "------------------------XtremIO Cluster #{counter.to_s}------------------------".colorize(:light_white)
+        puts "PSTN: ".colorize(:light_white) + clusterData[:pstn].to_s
+        puts "Name: ".colorize(:light_white) + clusterData[:name].to_s
+        puts "Dossier Date: ".colorize(:light_white) + clusterData[:timestamp].to_s
+        puts "Cluster Code: ".colorize(:light_white) + clusterData[:code].to_s
+        puts "Cluster Type: ".colorize(:light_white) + clusterData[:type].to_s
+        puts "Cluster State: ".colorize(:light_white) + clusterData[:state].to_s
+        puts "Physical Usable (TB): ".colorize(:light_white) + clusterData[:physUsable].to_s
+        puts "Physical Consumed (TB): ".colorize(:light_white) + clusterData[:physConsumed].to_s
+        puts "Physical Free (TB): ".colorize(:light_white) + clusterData[:physFree].to_s
+        puts "% Full: ".colorize(:light_white) + clusterData[:percFull].to_s
+        puts "Logical Consumed (TB): ".colorize(:light_white) + clusterData[:logicalConsumed].round(2).to_s
+        puts "Total Logical (TB): ".colorize(:light_white) + clusterData[:totalLogical].round(2).to_s
+        puts "Source Vol Count: ".colorize(:light_white) + clusterData[:sourceVolCount].to_s
+        puts "Snap Vol Count: ".colorize(:light_white) + clusterData[:snapVolCount].to_s
+        puts "Dedupe: ".colorize(:light_white) + clusterData[:dedupe].to_s
+        puts "Compression: ".colorize(:light_white) + clusterData[:compression].to_s
+        puts "DRR: ".colorize(:light_white) + clusterData[:drr].to_s
+        puts "Thin Ratio: ".colorize(:light_white) + clusterData[:thinRatio].to_s
+        puts "Overall Efficiency: ".colorize(:light_white) + clusterData[:overallEff].to_s
+        puts " "
+        counter += 1
       end
-      csv <<["Totals","-","-","-","-","-",totalsHash[:totalPhysUsable],totalsHash[:totalPhysConsumed],totalsHash[:totalPhysFree],"-",totalsHash[:totalSvgConsumed],totalsHash[:totalSvgTotalLogical],totalsHash[:totalSourceVolCount],totalsHash[:totalSnapVolCount],
-             "-", "-", totalsHash[:totalDRR],"-","-"]
-
-      #if verbose flag is set
-      if DossierEngine.getFlags == true
+      puts "--------------------------------------------------------------------------------".colorize(:light_white)
+    else
+      CSV.open(DossierEngine.generateCSVFilename(location), "w") do |csv|
+        csv <<["XtremIO Summary Report:", Time.now.strftime('%m/%d/%Y - %H:%M:%S')]
         csv <<[" "]
-        csv <<["Verbose Cluster Information"]
-        csv <<["Serial Number", "Cluster Name", "Physical Consumed (TB)", "Source Logical Consumed (TB)", "Snapshot Logical Consumed (TB)", "Combined Logical Consumed (TB)", "DRR - Source", "DRR - Snap", "DRR - Combined"]
+        csv <<[" "]
+        csv <<["Basic Cluster Information"]
+        csv <<["Serial Number", "Cluster Name", "Dossier Date","Cluster Code", "Cluster Type", "Cluster State", "Physical Usable (TB)", "Physical Consumed (TB)", "Physical Free (TB)", "% Full",
+               "Logical Consumed (TB)", "Total Logical (TB)", "Source Vol Count", "Snap Vol Count",
+               "Dedupe", "Compression", "DRR", "Thin Ratio", "Overall Efficiency"]
         clustersArray.each do |clusterData|
-          csv << [clusterData[:pstn], clusterData[:name], clusterData[:physConsumed], clusterData[:sourceLogicalConsumed], clusterData[:snapLogicalConsumed], clusterData[:combinedLogicalConsumed],
-                  clusterData[:sourceDRR], clusterData[:snapDRR], clusterData[:combinedDRR]]
+          csv << [clusterData[:pstn], clusterData[:name], clusterData[:timestamp], clusterData[:code], clusterData[:type], clusterData[:state], clusterData[:physUsable], clusterData[:physConsumed],
+                  clusterData[:physFree], clusterData[:percFull], clusterData[:logicalConsumed], clusterData[:totalLogical], clusterData[:sourceVolCount], clusterData[:snapVolCount],
+                  clusterData[:dedupe], clusterData[:compression], clusterData[:drr], clusterData[:thinRatio], clusterData[:overallEff]]
         end
-        csv <<["Totals","-",totalsHash[:totalPhysConsumed],totalsHash[:totalSourceLogicalConsumed],totalsHash[:totalSnapLogicalConsumed],totalsHash[:totalCombinedLogicalConsumed],totalsHash[:totalSourceDRR],totalsHash[:totalSnapDRR],totalsHash[:totalCombinedDRR]]
+        csv <<["Totals","-","-","-","-","-",totalsHash[:totalPhysUsable],totalsHash[:totalPhysConsumed],totalsHash[:totalPhysFree],"-",totalsHash[:totalSvgConsumed],totalsHash[:totalSvgTotalLogical],totalsHash[:totalSourceVolCount],totalsHash[:totalSnapVolCount],
+               "-", "-", totalsHash[:totalDRR],"-","-"]
+
+        #if verbose flag is set
+        if DossierEngine.getVerboseFlag == true
+          csv <<[" "]
+          csv <<["Verbose Cluster Information"]
+          csv <<["Serial Number", "Cluster Name", "Physical Consumed (TB)", "Source Logical Consumed (TB)", "Snapshot Logical Consumed (TB)", "Combined Logical Consumed (TB)", "DRR - Source", "DRR - Snap", "DRR - Combined"]
+          clustersArray.each do |clusterData|
+            csv << [clusterData[:pstn], clusterData[:name], clusterData[:physConsumed], clusterData[:sourceLogicalConsumed], clusterData[:snapLogicalConsumed], clusterData[:combinedLogicalConsumed],
+                    clusterData[:sourceDRR], clusterData[:snapDRR], clusterData[:combinedDRR]]
+          end
+          csv <<["Totals","-",totalsHash[:totalPhysConsumed],totalsHash[:totalSourceLogicalConsumed],totalsHash[:totalSnapLogicalConsumed],totalsHash[:totalCombinedLogicalConsumed],totalsHash[:totalSourceDRR],totalsHash[:totalSnapDRR],totalsHash[:totalCombinedDRR]]
+        end
       end
     end
   end
