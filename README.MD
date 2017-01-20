@@ -23,9 +23,10 @@ Below are the steps required to run the summary script on Windows:
 
 #Use
 Below are the steps to run the report after you have the script installed:
+
 1. Place your dossier file(s) into a folder. In this example they will be placed in C:/Users/Administrator/Desktop/DossierFiles
 2. Navigate to the xtremio-config-report folder using Git Bash
 3. Make sure you are on the latest version of the script: ```git pull```
 4. From the xtremio-config-report folder run the generate summary command. Provide the full path to the dossier folder, including the trailing / at the end
-5. Example of running the report to generate csv output: ```ruby generateSummary.rb "C:/Users/Administrator/Desktop/DossierFiles/" "csv"```
-6. Example of running the report to generate cli output: ```ruby generateSummary.rb "C:/Users/Administrator/Desktop/DossierFiles/" "cli"```
+5. Example to generate csv output: ```ruby generateSummary.rb "C:/Users/Administrator/Desktop/DossierFiles/" "csv"```
+6. Example to generate cli output: ```ruby generateSummary.rb "C:/Users/Administrator/Desktop/DossierFiles/" "cli"```
