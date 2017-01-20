@@ -254,6 +254,7 @@ module DossierEngine
         counter += 1
       end
       puts "--------------------------------------------------------------------------------".colorize(:light_white)
+      puts "[Status] - Report complete".colorize(:light_white)
     else
       CSV.open(DossierEngine.generateCSVFilename(location), "w") do |csv|
         csv <<["XtremIO Summary Report:", Time.now.strftime('%m/%d/%Y - %H:%M:%S')]
@@ -281,6 +282,7 @@ module DossierEngine
                     clusterData[:sourceDRR], clusterData[:snapDRR], clusterData[:combinedDRR]]
           end
           csv <<["Totals","-",totalsHash[:totalPhysConsumed],totalsHash[:totalSourceLogicalConsumed],totalsHash[:totalSnapLogicalConsumed],totalsHash[:totalCombinedLogicalConsumed],totalsHash[:totalSourceDRR],totalsHash[:totalSnapDRR],totalsHash[:totalCombinedDRR]]
+          puts "[Status] - Report complete".colorize(:light_white)
         end
       end
     end
