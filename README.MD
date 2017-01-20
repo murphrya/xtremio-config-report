@@ -22,6 +22,7 @@ Below are the steps required to run the summary script on Windows:
 4. Install the Ruby dependencies: ```bundle install```
 
 #Use
+Below are the steps to run the report after you have the script installed:
 1. Place your dossier file(s) into a folder. In this example they will be placed in C:/Users/Administrator/Desktop/DossierFiles
 2. Navigate to the xtremio-config-report folder using Git Bash
 3. Make sure you are on the latest version of the script: ```git pull```
