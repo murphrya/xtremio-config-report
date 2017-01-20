@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 require 'json'
 require 'colorize'
-require 'terminal-table'
 require 'csv'
 load 'modules\dossierEngine.rb'
 load 'modules\reportEngine.rb'
@@ -12,7 +11,6 @@ include ReportEngine
 Process.setproctitle("XtremIO Summary Report")
 rawLocation = DossierEngine.getFileLocation
 location = DossierEngine.formatLocation(rawLocation)
-dossierCount = DossierEngine.getDossierCount(location)
 multipleJsonArray = DossierEngine.unpackMultipleDossierJson(location)
 
 #Main Program Loop
@@ -49,4 +47,4 @@ puts "[Status] - Generating totals from all XtremIO clusters"
 totalsHash = DossierEngine.generateTotals(clustersArray)
 
 puts "[Status] - Generating the csv summary file in #{location}"
-DossierEngine.generateSummaryCSV(clustersArray,totalsHash,location)
+DossierEngine.generateSummary(clustersArray,totalsHash,location)

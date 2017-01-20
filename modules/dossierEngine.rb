@@ -8,7 +8,12 @@ module DossierEngine
     return ARGV[0]
   end
 
-  #Get the location of the json file from the user
+  #Removes backslashes and replaces them with forward slashes if present
+  def formatLocation(location)
+    return location.gsub("\\","/")
+  end
+
+  #Returns the setting of the verbose flag. True if verbose report
   def getVerboseFlag
     if ARGV[2] == "verbose"
       return true
@@ -17,7 +22,7 @@ module DossierEngine
     end
   end
 
-  #Get the location of the json file from the user
+  #Returns the setting of the cli flag. True if cli output
   def getCliFlag
     if ARGV[1] == "cli"
       return true
@@ -26,28 +31,12 @@ module DossierEngine
     end
   end
 
-  #
-  def formatLocation(location)
-    return location.gsub("\\","/")
-  end
-
-  #
-  def getDossierCount(location)
-    dossierFiles = Dir[location+"*"]
-  end
-
-  #
-  def generateCSVFilename(location)
-    return location + "dossierSummary.csv"
-  end
-
-  #
+  #Opens up each dossier file and returns json data for all XtremIO clusters
   def unpackMultipleDossierJson(location)
-    dossierCount = getDossierCount(location).length
     counter = 1
     multipleJsonArray = []
     dossierFiles = Dir[location+"*"]
-    puts "[Status] - There are #{dossierCount} files that will be unpacked:"
+    puts "[Status] - There are #{dossierFiles.length} files that will be unpacked:"
     dossierFiles.each do |dossier|
       puts "[Status] - Unpacking dossier file #{counter}"
 
@@ -75,7 +64,7 @@ module DossierEngine
     return multipleJsonArray
   end
 
-  #
+  #Returns the timestap from the dossier file
   def getDossierTimestamp(location,pstn)
     timestamp = nil
     dossierFiles = Dir[location+"*"]
@@ -97,7 +86,22 @@ module DossierEngine
     return timestamp
   end
 
-  #
+  #Return the number of XtremIO clusters connected to the XMS server
+  def getClusterCount(jsonHash)
+    return jsonHash["AllSystems"].length.to_i
+  end
+
+  #Returns all volumes assoicated with the XMS servers clusters
+  def getAllVolumes(jsonHash)
+    return jsonHash["AllVolumes"]
+  end
+
+  #Returns all volume snapshot groups associated with the XMS servers clusters
+  def getAllSnapshotGroups(jsonHash)
+    return jsonHash["AllSnapshotGroups"]
+  end
+
+  #Returns an array containing data for each XtremIO
   def getClusterData(counter,jsonHash,allVolumes,allSnapshotGroups,location)
     clusterData = nil
     clusterCode = jsonHash["SystemsInfo"][counter]["sys_sw_version"]
@@ -174,7 +178,7 @@ module DossierEngine
     return clusterData
   end
 
-  #
+  #Returns a hash containing the totals for various categories
   def generateTotals(clustersArray)
     totalPhysUsable = 0.0
     totalPhysConsumed = 0.0
@@ -215,8 +219,13 @@ module DossierEngine
             :totalCombinedDRR => totalCombinedDRR}
   end
 
-  #
-  def generateSummaryCSV(clustersArray,totalsHash,location)
+  #Returns the filename for the csv summary file.
+  def generateCSVFilename(location)
+    return location + "dossierSummary.csv"
+  end
+
+  #Returns csv or cli summary of dossier files depending on CLI flags
+  def generateSummary(clustersArray,totalsHash,location)
     if DossierEngine.getCliFlag == true
       counter = 1
       puts " "
@@ -276,53 +285,5 @@ module DossierEngine
       end
     end
   end
-
-  #Opens dossier file and pulls out the json data
-  def unpackDossieJson(location)
-    %x[unzip #{location} -d temp1x2y3z4]
-    filenames = Dir["temp1x2y3z4/*"]
-    filenames.each do |filename|
-      if filename.include? ".bz2"
-        %x[mkdir temp2a3b4c5]
-        %x[tar -xvf #{filename} -C temp2a3b4c5]
-      end
-    end
-    json = JSON.parse(File.read('temp2a3b4c5/small/xms/xmcli/show_all.json'))
-    %x[rm -rf temp1x2y3z4]
-    %x[rm -rf temp2a3b4c5]
-    return json
-  end
-
-  #Pulls in the JSON from the user file and maps it to a Ruby Hash
-  def getJson(location)
-    return JSON.parse(File.read(location))
-  end
-
-  #Handles the file type passed to the tool
-  def generateJsonHash(location)
-    if ARGV[0].include? ".json"
-      return getJson(location)
-    end
-    if ARGV[0].include? ".zip"
-      return unpackDossieJson(location)
-    end
-  end
-
-  #Return the number of XtremIO clusters connected to the XMS server
-  def getClusterCount(jsonHash)
-    return jsonHash["AllSystems"].length.to_i
-  end
-
-  #Returns all volumes assoicated with the XMS servers clusters
-  def getAllVolumes(jsonHash)
-    return jsonHash["AllVolumes"]
-  end
-
-  #Returns all volume snapshot groups associated with the XMS servers clusters
-  def getAllSnapshotGroups(jsonHash)
-    return jsonHash["AllSnapshotGroups"]
-  end
-
-
 
 end
