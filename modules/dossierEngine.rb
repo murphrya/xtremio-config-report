@@ -54,7 +54,20 @@ module DossierEngine
           %x[tar -xvf #{filename} -C temp2a3b4c5]
         end
       end
-      json = JSON.parse(File.read('temp2a3b4c5/small/xms/xmcli/show_all.json'))
+
+      folders = Dir.glob("temp2a3b4c5/**/")
+      json = nil
+
+      ## if a SRY dossier is used
+      if folders.include? 'temp2a3b4c5/small/'
+        json = JSON.parse(File.read('temp2a3b4c5/small/xms/xmcli/show_all.json'))
+      end
+
+      ## if a GUI dossier is used
+      if folders.include? 'temp2a3b4c5/latest/'
+        json = JSON.parse(File.read('temp2a3b4c5/latest/xms/xmcli/show_all.json'))
+      end
+
       multipleJsonArray.push(json)
       FileUtils.rm_rf 'temp1x2y3z4'
       FileUtils.rm_rf 'temp2a3b4c5'
