@@ -56,6 +56,7 @@ module DossierEngine
       end
 
       folders = Dir.glob("temp2a3b4c5/**/")
+
       json = nil
 
       ## if a SRY dossier is used
@@ -67,6 +68,7 @@ module DossierEngine
       if folders.include? 'temp2a3b4c5/latest/'
         json = JSON.parse(File.read('temp2a3b4c5/latest/xms/xmcli/show_all.json'))
       end
+
 
       multipleJsonArray.push(json)
       FileUtils.rm_rf 'temp1x2y3z4'
